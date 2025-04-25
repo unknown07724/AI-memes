@@ -101,7 +101,7 @@
     <script>
         // Fetch templates from the dataset.json file
         async function fetchTemplates() {
-            const response = await fetch('dataset.json?t=' + new Date().getTime()');
+            const response = await fetch('dataset.json?t=' + new Date().getTime());
             const templates = await response.json();
             return templates;
         }
