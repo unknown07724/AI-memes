@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Meme Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .header button {
+            padding: 10px 20px;
+            background-color: #ff5733;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .header button:hover {
+            background-color: #ff3300;
+        }
+        .meme-card {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .meme-card .meme-text {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .meme-card img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .meme-card button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #ff5733;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .meme-card button:hover {
+            background-color: #ff3300;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>AI Meme Generator</h1>
+        <button onclick="window.location.href='meme-maker.html'">Make One!</button>
+    </div>
+
+    <div id="meme-gallery">
+        <!-- Random memes will be loaded here -->
+    </div>
+
+    <script>
+        // Sample meme text templates (using ";" to split the text into top and bottom)
+        const memeTemplates = [
+            "When you realize it's Monday...;but it's only Wednesday",
+            "Expectation vs Reality...;the struggle is real",
+            "That moment when you can't stop laughing...;at your own joke",
+            "When you finally get a day off!;and do nothing all day",
+            "Me trying to understand life...;like a confused dog",
+            "When the Wi-Fi disconnects for 5 seconds...;and everything falls apart"
+        ];
+
+        // Meme images URLs (use placeholders or actual meme images)
+        const memeImages = [
+            "https://placekitten.com/400/400",  // Random image (replace with real meme images)
+            "https://placekitten.com/400/450",
+            "https://placekitten.com/500/500"
+        ];
+
+        // Function to generate random memes
+        function generateRandomMeme() {
+            const randomText = memeTemplates[Math.floor(Math.random() * memeTemplates.length)];
+            const randomImage = memeImages[Math.floor(Math.random() * memeImages.length)];
+
+            // Split meme text by ";"
+            const memeParts = randomText.split(';');
+            const topText = memeParts[0];
+            const bottomText = memeParts[1] || '';  // In case there's no bottom text
+
+            // Create meme card dynamically
+            const memeCard = document.createElement("div");
+            memeCard.classList.add("meme-card");
+
+            // Create top text element
+            const memeTopText = document.createElement("p");
+            memeTopText.classList.add("meme-text");
+            memeTopText.textContent = topText;
+
+            // Create bottom text element
+            const memeBottomText = document.createElement("p");
+            memeBottomText.classList.add("meme-text");
+            memeBottomText.textContent = bottomText;
+
+            const memeImage = document.createElement("img");
+            memeImage.src = randomImage;
+            memeImage.alt = "AI Meme";
+
+            // Append elements to the meme card
+            memeCard.appendChild(memeTopText);
+            memeCard.appendChild(memeBottomText);
+            memeCard.appendChild(memeImage);
+
+            // Append meme card to the gallery
+            document.getElementById("meme-gallery").appendChild(memeCard);
+        }
+
+        // Generate 3 random memes on page load
+        for (let i = 0; i < 3; i++) {
+            generateRandomMeme();
+        }
+    </script>
+
+</body>
+</html>
