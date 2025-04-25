@@ -3,170 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meme Maker</title>
+    <title>AI Meme Maker</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background-color: #333;
-            color: white;
-        }
-        .header h1 {
-            margin: 0;
-        }
-        .meme-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-            position: relative;
-        }
         .meme-card {
-            text-align: center;
-            background: white;
-            padding: 20px;
-            margin: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            position: relative; /* Needed for positioning text boxes in corners */
-        }
-        .meme-card .meme-text {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+            margin: 10px;
         }
         .meme-card img {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-top: 10px;
+            width: 500px;
+            height: 500px;
+            object-fit: cover;
         }
-        .form-container {
-            text-align: center;
-            margin: 20px;
-        }
-        .form-container button {
-            padding: 10px 20px;
-            font-size: 16px;
-            margin: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #ff5733;
-            color: white;
-            cursor: pointer;
-        }
-        .form-container button:hover {
-            background-color: #ff3300;
-        }
-        /* Custom style for corner positioning of text boxes */
-        .corner-textbox {
+        .meme-text {
             position: absolute;
-            max-width: 90%;
-            word-wrap: break-word;
-            font-size: 24px;
             color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px;
-            border-radius: 5px;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
         }
-        .top-left { top: 10px; left: 10px; }
-        .top-right { top: 10px; right: 10px; }
-        .bottom-left { bottom: 10px; left: 10px; }
-        .bottom-right { bottom: 10px; right: 10px; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h1>Meme Maker</h1>
-        <button onclick="window.location.href='index.html'">Back to Gallery</button>
-    </div>
-
-    <div class="form-container">
-        <h3>Generate Meme</h3>
-        <button onclick="generateMeme()">Generate Random Meme</button>
-    </div>
-
-    <div class="meme-container" id="meme-container">
-        <!-- Meme will be displayed here -->
-    </div>
+    <h1>AI Meme Maker</h1>
+    <div id="meme-container"></div>
 
     <script>
-        // Fetch templates from the dataset.json file
+        // Function to check if the file exists and return the appropriate format
+        async function checkFileExistence(templateId) {
+            const formats = ['png', 'jpg', 'jfif']; // Define the formats in order of preference
+            const memeContainer = document.getElementById('meme-container'); // Meme container
+
+            // Try loading each file format
+            for (let format of formats) {
+                const imageUrl = `templates/${templateId}.${format}`;
+                const image = new Image();
+
+                // Check if the image can be loaded
+                image.onload = () => {
+                    // If image is successfully loaded, use it
+                    memeContainer.innerHTML = '';  // Clear previous meme content
+                    memeContainer.appendChild(image); // Append the image to the container
+                    generateTextBoxes(image, templateId); // Generate text boxes after image is loaded
+                };
+
+                // Image onerror will be triggered if the image does not exist
+                image.onerror = () => {
+                    console.log(`Image format .${format} not found, trying next...`);
+                };
+
+                // Set the image src to start the loading process
+                image.src = imageUrl + '?' + new Date().getTime(); // Append a timestamp to avoid cache
+            }
+        }
+
+        // Function to generate random meme text and add text boxes
+        async function generateMeme() {
+            const templates = await fetchTemplates();  // Fetch templates from dataset.json
+            const randomTemplate = templates[Math.floor(Math.random() * templates.length)]; // Random template selection
+            const memeTextParts = randomTemplate.split(';'); // Split template into parts based on semicolon
+            let templateId = 2;  // Default template ID
+
+            const lastPart = memeTextParts[memeTextParts.length - 1];
+            if (lastPart.includes(':')) {
+                const idParts = lastPart.split(':');
+                templateId = parseInt(idParts[1], 10);  // Extract template ID
+                memeTextParts[memeTextParts.length - 1] = idParts[0];  // Remove the ID part
+            }
+
+            // Handle special case for template ID 2 (Gru's Plan meme with 4 textboxes in corners)
+            const textBoxesCount = templateId === 2 ? 4 : Math.max(memeTextParts.length, 2); // Default to 2 textboxes or 4 for ID 2
+            checkFileExistence(templateId); // Check and display the image
+        }
+
+        // Function to fetch templates from dataset.json
         async function fetchTemplates() {
-            const response = await fetch('dataset.json?t=' + new Date().getTime());
+            const response = await fetch('dataset.json?' + new Date().getTime());  // Cache busting with timestamp
             const templates = await response.json();
             return templates;
         }
 
-        // Function to generate a random meme
-        async function generateMeme() {
-            // Fetch templates from dataset.json
-            const templates = await fetchTemplates();
-            
-            // Select a random template from the fetched templates
-            const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
-
-            // Split the template text into parts using ';'
-            const memeTextParts = randomTemplate.split(';');
-
-            // Extract the template ID if available (last part after ':')
-            let templateId = 2; // Default to 2 if no ID is found
-            const lastPart = memeTextParts[memeTextParts.length - 1];
-            if (lastPart.includes(':')) {
-                const idParts = lastPart.split(':');
-                templateId = parseInt(idParts[1], 10); // Extract template ID
-                memeTextParts[memeTextParts.length - 1] = idParts[0]; // Remove the ID from the last part
-            }
-
-            // Handle special case for template ID 2 (Gru's Plan meme with 4 textboxes in corners)
-            const textBoxesCount = templateId === 2 ? 4 : Math.max(memeTextParts.length, 2);
-
-            // Get the meme container element to display the meme
+        // Function to generate text boxes for meme text
+        function generateTextBoxes(image, templateId) {
             const memeContainer = document.getElementById('meme-container');
-            memeContainer.innerHTML = '';  // Clear previous meme
-
-            // Create a meme card with the generated meme
             const memeCard = document.createElement('div');
             memeCard.classList.add('meme-card');
 
-            // Add the image (for the meme) to the meme card
-            const memeImage = document.createElement('img');
-            memeImage.src = `templates/${templateId}`; // Image based on template ID (adjust image extension accordingly)
-            memeImage.alt = "Generated Meme";
-            memeCard.appendChild(memeImage);
+            const textBoxCount = templateId === 2 ? 4 : 2;  // Default to 2 textboxes, or 4 for ID 2 (Gru's Plan meme)
 
-            // For template ID 2 (Gru's Plan), position text boxes in the corners
-            if (templateId === 2) {
-                const cornerTexts = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
-                for (let i = 0; i < memeTextParts.length; i++) {
-                    if (i >= 4) break;  // Limit to 4 textboxes for Gru's Plan
-                    const textBox = document.createElement('div');
-                    textBox.classList.add('corner-textbox', cornerTexts[i]);
-                    textBox.textContent = memeTextParts[i] || '';  // Add text or empty string
-                    memeCard.appendChild(textBox);
-                }
-            } else {
-                // For other templates, just add normal text boxes
-                for (let i = 0; i < textBoxesCount; i++) {
-                    const memeText = document.createElement('p');
-                    memeText.classList.add('meme-text');
-                    memeText.textContent = memeTextParts[i] || '';  // If there's no text part, use an empty string
-                    memeCard.appendChild(memeText);
-                }
-            }
-
-            // Add the meme card to the meme container
+            // Add meme image to meme card
+            memeCard.appendChild(image);
             memeContainer.appendChild(memeCard);
-        }
-    </script>
 
+            // Create text boxes and position them
+            const memeTextParts = ['Top Text', 'Bottom Text']; // Example text parts for now
+            for (let i = 0; i < textBoxCount; i++) {
+                const memeTextBox = document.createElement('div');
+                memeTextBox.classList.add('meme-text');
+                memeTextBox.style.top = `${(i * 100)}px`; // Example positioning (adjust for your layout)
+                memeTextBox.style.left = `${(i * 100)}px`;
+                memeTextBox.innerText = memeTextParts[i % memeTextParts.length];
+                memeCard.appendChild(memeTextBox);
+            }
+        }
+
+        // Call generateMeme to display a random meme on page load
+        generateMeme();
+    </script>
 </body>
 </html>
