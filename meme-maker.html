@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meme Maker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .meme-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            position: relative;
+        }
+        .meme-card {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            position: relative; /* Needed for positioning text boxes in corners */
+        }
+        .meme-card .meme-text {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .meme-card img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .form-container {
+            text-align: center;
+            margin: 20px;
+        }
+        .form-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #ff5733;
+            color: white;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #ff3300;
+        }
+        /* Custom style for corner positioning of text boxes */
+        .corner-textbox {
+            position: absolute;
+            max-width: 90%;
+            word-wrap: break-word;
+            font-size: 24px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .top-left { top: 10px; left: 10px; }
+        .top-right { top: 10px; right: 10px; }
+        .bottom-left { bottom: 10px; left: 10px; }
+        .bottom-right { bottom: 10px; right: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Meme Maker</h1>
+        <button onclick="window.location.href='index.html'">Back to Gallery</button>
+    </div>
+
+    <div class="form-container">
+        <h3>Generate Meme</h3>
+        <button onclick="generateMeme()">Generate Random Meme</button>
+    </div>
+
+    <div class="meme-container" id="meme-container">
+        <!-- Meme will be displayed here -->
+    </div>
+
+    <script>
+        // Fetch templates from the dataset.json file
+        async function fetchTemplates() {
+            const response = await fetch('dataset.json');
+            const templates = await response.json();
+            return templates;
+        }
+
+        // Function to generate a random meme
+        async function generateMeme() {
+            // Fetch templates from dataset.json
+            const templates = await fetchTemplates();
+            
+            // Select a random template from the fetched templates
+            const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
+
+            // Split the template text into parts using ';'
+            const memeTextParts = randomTemplate.split(';');
+
+            // Extract the template ID if available (last part after ':')
+            let templateId = 2; // Default to 2 if no ID is found
+            const lastPart = memeTextParts[memeTextParts.length - 1];
+            if (lastPart.includes(':')) {
+                const idParts = lastPart.split(':');
+                templateId = parseInt(idParts[1], 10); // Extract template ID
+                memeTextParts[memeTextParts.length - 1] = idParts[0]; // Remove the ID from the last part
+            }
+
+            // Handle special case for template ID 2 (Gru's Plan meme with 4 textboxes in corners)
+            const textBoxesCount = templateId === 2 ? 4 : Math.max(memeTextParts.length, 2);
+
+            // Get the meme container element to display the meme
+            const memeContainer = document.getElementById('meme-container');
+            memeContainer.innerHTML = '';  // Clear previous meme
+
+            // Create a meme card with the generated meme
+            const memeCard = document.createElement('div');
+            memeCard.classList.add('meme-card');
+
+            // Add the image (for the meme) to the meme card
+            const memeImage = document.createElement('img');
+            memeImage.src = `templates/${templateId}.jpg`; // Image based on template ID (adjust image extension accordingly)
+            memeImage.alt = "Generated Meme";
+            memeCard.appendChild(memeImage);
+
+            // For template ID 2 (Gru's Plan), position text boxes in the corners
+            if (templateId === 2) {
+                const cornerTexts = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+                for (let i = 0; i < memeTextParts.length; i++) {
+                    if (i >= 4) break;  // Limit to 4 textboxes for Gru's Plan
+                    const textBox = document.createElement('div');
+                    textBox.classList.add('corner-textbox', cornerTexts[i]);
+                    textBox.textContent = memeTextParts[i] || '';  // Add text or empty string
+                    memeCard.appendChild(textBox);
+                }
+            } else {
+                // For other templates, just add normal text boxes
+                for (let i = 0; i < textBoxesCount; i++) {
+                    const memeText = document.createElement('p');
+                    memeText.classList.add('meme-text');
+                    memeText.textContent = memeTextParts[i] || '';  // If there's no text part, use an empty string
+                    memeCard.appendChild(memeText);
+                }
+            }
+
+            // Add the meme card to the meme container
+            memeContainer.appendChild(memeCard);
+        }
+    </script>
+
+</body>
+</html>
