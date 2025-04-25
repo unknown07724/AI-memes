@@ -5,22 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Meme Maker</title>
     <style>
-        .meme-card {
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .meme-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
             position: relative;
-            display: inline-block;
-            margin: 10px;
+        }
+        .meme-card {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            position: relative; /* Needed for positioning text boxes in corners */
+        }
+        .meme-card .meme-text {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
         }
         .meme-card img {
-            width: 500px;
-            height: 500px;
-            object-fit: cover;
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
         }
-        .meme-text {
-            position: absolute;
+        .form-container {
+            text-align: center;
+            margin: 20px;
+        }
+        .form-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #ff5733;
             color: white;
-            font-size: 24px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            cursor: pointer;
         }
+        .form-container button:hover {
+            background-color: #ff3300;
+        }
+        /* Custom style for corner positioning of text boxes */
+        .corner-textbox {
+            position: absolute;
+            max-width: 90%;
+            word-wrap: break-word;
+            font-size: 24px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .top-left { top: 10px; left: 10px; }
+        .top-right { top: 10px; right: 10px; }
+        .bottom-left { bottom: 10px; left: 10px; }
+        .bottom-right { bottom: 10px; right: 10px; }
     </style>
 </head>
 <body>
